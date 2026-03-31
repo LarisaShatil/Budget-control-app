@@ -7,3 +7,6 @@ Users can:
 + expenses, 
 + transfer from balance account to saving account, 
 + reset saving target.
+
+## Images 
+image.png

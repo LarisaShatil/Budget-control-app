@@ -1,32 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState } from 'react';
 import {
   Box,
   TextField,
   Button,
   Typography,
 } from "@mui/material";
-import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import CircularProgress from "@mui/material/CircularProgress";
+import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
+import RestartAltRoundedIcon from "@mui/icons-material/RestartAltRounded";
 
 import { SavingProps } from "../types/saving";
-import { addExpense } from '../redux/reducers/expenses';
 
 const Saving = ({ saving, setSaving }: SavingProps) => {
   const [target, setTarget] = useState(0);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(addExpense({
-      title: "test",
-      amount: 23,
-      date: 'test',
-    }))
-  }, [])
-
-  const incomes = useSelector((state: any) => state.incomeReducer);
-  const expenses = useSelector((state: any) => state.expenseReducer);
-
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -55,8 +41,21 @@ const Saving = ({ saving, setSaving }: SavingProps) => {
         alignItems="flex-start"
         gap={2}
       >
-        <Typography variant="h2" color="primary.title" fontSize={20}>
-          SET TARGET
+        <Box display="flex" alignItems="center" gap={1}>
+          <FlagOutlinedIcon color="info" fontSize="small" />
+          <Typography variant="h2" sx={{ color: "text.primary" }}>
+            SET TARGET
+          </Typography>
+        </Box>
+
+        <Typography
+          variant="subtitle1"
+          sx={{ color: "text.secondary", fontWeight: 800 }}
+        >
+          Current saving:{" "}
+          <Box component="span" sx={{ color: "text.primary" }}>
+            {saving}
+          </Box>
         </Typography>
 
         <TextField
@@ -71,7 +70,7 @@ const Saving = ({ saving, setSaving }: SavingProps) => {
         />
         <Button
           startIcon={
-            <CancelOutlinedIcon className="btn-icon" color="primary" />
+            <RestartAltRoundedIcon />
           }
           className="cancel-btn"
           type="submit"
@@ -79,11 +78,14 @@ const Saving = ({ saving, setSaving }: SavingProps) => {
         >
           Reset
         </Button>
-        <Typography variant="subtitle1" sx={{ color: "text.secondary" }}>
-          Current saving: {saving}
-        </Typography>
-        <Typography variant="subtitle1" sx={{ color: "text.secondary" }}>
-          Current target: {target}
+        <Typography
+          variant="subtitle1"
+          sx={{ color: "text.secondary", fontWeight: 800 }}
+        >
+          Current target:{" "}
+          <Box component="span" sx={{ color: "text.primary" }}>
+            {target}
+          </Box>
         </Typography>
         <Box
           sx={{

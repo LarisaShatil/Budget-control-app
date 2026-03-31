@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 
 import { Box, Button, TextField, InputAdornment, Typography } from "@mui/material";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined";
+import AttachMoneyRoundedIcon from "@mui/icons-material/AttachMoneyRounded";
+import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
+import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
+import TrendingDownRoundedIcon from "@mui/icons-material/TrendingDownRounded";
 
 import { MoneyProps } from "../types/money";
 import MoneyTable from "./MoneyTable";
-
-const Plus = AddCircleOutlineIcon,
-  Minus = RemoveCircleOutlineOutlinedIcon;
 
 const Money = ({ name, list, balance, setList }: MoneyProps) => {
   const [title, setTitle] = useState("");
@@ -45,14 +44,6 @@ const Money = ({ name, list, balance, setList }: MoneyProps) => {
     setDate("");
   };
 
-  const RenderIcon = () => {
-    return name === "income" ? (
-      <Plus className="btn-icon" color="primary" />
-    ) : (
-      <Minus className="btn-icon" color="primary" />
-    );
-  };
-
   return (
     <Box display="flex" flexDirection="column" alignItems="center">
       <Box
@@ -64,9 +55,16 @@ const Money = ({ name, list, balance, setList }: MoneyProps) => {
         alignItems="flex-start"
         gap={2}
       >
-        <Typography variant="h2" color="primary.title" fontSize={20}>
-          {name.toUpperCase()}
-        </Typography>
+        <Box display="flex" alignItems="center" gap={1}>
+          {name === "income" ? (
+            <TrendingUpRoundedIcon color="primary" fontSize="small" />
+          ) : (
+            <TrendingDownRoundedIcon color="secondary" fontSize="small" />
+          )}
+          <Typography variant="h2" sx={{ color: "text.primary" }}>
+            {name.toUpperCase()}
+          </Typography>
+        </Box>
         <TextField
           required
           label={`Source of ${name}`}
@@ -102,7 +100,13 @@ const Money = ({ name, list, balance, setList }: MoneyProps) => {
         />
 
         <Button
-          startIcon={RenderIcon()}
+          startIcon={
+            name === "income" ? (
+              <AttachMoneyRoundedIcon />
+            ) : (
+              <ReceiptLongRoundedIcon />
+            )
+          }
           type="submit"
           variant="contained"
           sx={{ marginBottom: 2 }}

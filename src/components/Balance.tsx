@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Box, TextField, Button, Typography } from "@mui/material";
-import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
+import CompareArrowsRoundedIcon from "@mui/icons-material/CompareArrowsRounded";
+import SwapHorizRoundedIcon from "@mui/icons-material/SwapHorizRounded";
 
 import { BalanceProps } from '../types/balance';
 
@@ -26,15 +27,20 @@ const Balance = ({balance, setSaving}:BalanceProps) => {
         alignItems="flex-start"
         gap={2}
       >
+        <Box display="flex" alignItems="center" gap={1}>
+          <CompareArrowsRoundedIcon color="primary" fontSize="small" />
+          <Typography variant="h2" sx={{ color: "text.primary" }}>
+            MAKE TRANSFER
+          </Typography>
+        </Box>
         <Typography
-          variant="h2"
-          color ="primary.title"
-          fontSize={20}
+          variant="subtitle1"
+          sx={{ color: "text.secondary", fontWeight: 800 }}
         >
-          MAKE TRANSFER
-        </Typography>
-        <Typography variant="subtitle1" sx={{ color: "text.secondary" }}>
-          Current balance: {balance.toFixed(2)}
+          Current balance:{" "}
+          <Box component="span" sx={{ color: "text.primary" }}>
+            {balance.toFixed(2)}
+          </Box>
         </Typography>
         <TextField
           required
@@ -52,7 +58,7 @@ const Balance = ({balance, setSaving}:BalanceProps) => {
 
         <Button
           startIcon={
-            <SavingsOutlinedIcon className="btn-icon"  />
+            <SwapHorizRoundedIcon />
           }
           type="submit"
           variant="contained"

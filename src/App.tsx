@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
+  AppBar,
   Box,
+  Container,
+  CssBaseline,
   Grid,
   IconButton,
+  Paper,
+  Toolbar,
   ThemeProvider,
-  createTheme,
   Typography,
 } from "@mui/material";
 
@@ -15,24 +19,30 @@ import "./App.css";
 import Money from "./components/Money";
 import Balance from "./components/Balance";
 import Saving from "./components/Saving";
-import light from "./styles/lightTheme";
-import dark from "./styles/darkTheme";
+import { getTheme } from "./styles/theme";
 
 import { MoneyItem } from "./types/money";
+
+const THEME_STORAGE_KEY = "themeMode";
 
 function App() {
   const [incomes, setIncomes] = useState<MoneyItem[]>([]);
   const [expenses, setExpenses] = useState<MoneyItem[]>([]);
   const [saving, setSaving] = useState(0);
   const [balance, setBalance] = useState(0);
-  const [mode, setMode] = useState<"light" | "dark">("light");
-
-  const theme = createTheme({
-    palette: {
-      mode,
-      ...(mode === "light"  ? light  :  dark ),
-    },
+  const [mode, setMode] = useState<"light" | "dark">(() => {
+    try {
+      const stored = localStorage.getItem(THEME_STORAGE_KEY);
+      if (stored === "light" || stored === "dark") return stored;
+    } catch {
+      // ignore
+    }
+    return window.matchMedia?.("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
   });
+
+  const theme = useMemo(() => getTheme(mode), [mode]);
 
   const totalIncome = incomes.reduce(
     (prev, curr) => Number(prev) + Number(curr.amount),
@@ -45,68 +55,86 @@ function App() {
 
   useEffect(() => {
     setBalance(totalIncome - totalExpenses - saving);
-  }, [incomes, expenses, saving]);
+  }, [saving, totalExpenses, totalIncome]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, mode);
+    } catch {
+      // ignore
+    }
+  }, [mode]);
 
   return (
     <ThemeProvider theme={theme}>
-      <Box
-        className="App"
-        sx={{ bgcolor: "background.default", minHeight: "100vh" }}
-        padding={2}
-      >
-        <Box display="flex" justifyContent="center">
-          <IconButton
-            onClick={() => setMode(mode === "dark" ? "light" : "dark")}
-          >
-            {mode === "light" ? <Brightness4Icon /> : <Brightness7Icon />}
-          </IconButton>
-          <Typography
-            variant="h1"
-            sx={{
-              fontSize: "2.3rem",
-              color: "primary.title",
-              marginLeft: 3,
-            }}
-          >
-            Budget control App
-          </Typography>
-        </Box>
+      <CssBaseline />
+      <Box sx={{ minHeight: "100vh" }}>
+        <AppBar
+          position="sticky"
+          elevation={0}
+          color="transparent"
+          sx={{ borderBottom: 1, borderColor: "divider", backdropFilter: "blur(10px)" }}
+        >
+          <Toolbar>
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 2,
+              }}
+            >
+              <Typography variant="h1">Budget control</Typography>
+              <IconButton
+                aria-label="Toggle light/dark mode"
+                onClick={() => setMode(mode === "dark" ? "light" : "dark")}
+                color="inherit"
+                size="small"
+              >
+                {mode === "light" ? <Brightness4Icon /> : <Brightness7Icon />}
+              </IconButton>
+            </Box>
+          </Toolbar>
+        </AppBar>
 
-        <Grid container spacing={2} marginTop={2}>
-          <Grid
-            item
-            md={6}
-            sm={6}
-            sx={{
-              borderBottom: "2px solid lightgrey",
-              borderTop: "2px solid lightgrey",
-            }}
-          >
-            <Money name="income" list={incomes} setList={setIncomes} />
+        <Container maxWidth="lg" sx={{ py: 3 }}>
+          <Grid container spacing={2} alignItems="stretch">
+            <Grid item xs={12} md={6} sx={{ display: "flex" }}>
+              <Paper sx={{ p: 2, flexGrow: 1, display: "flex" }}>
+                <Box sx={{ width: "100%" }}>
+                  <Money name="income" list={incomes} setList={setIncomes} />
+                </Box>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={6} sx={{ display: "flex" }}>
+              <Paper sx={{ p: 2, flexGrow: 1, display: "flex" }}>
+                <Box sx={{ width: "100%" }}>
+                  <Money
+                    name="expense"
+                    list={expenses}
+                    setList={setExpenses}
+                    balance={balance}
+                  />
+                </Box>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={6} sx={{ display: "flex" }}>
+              <Paper sx={{ p: 2, flexGrow: 1, display: "flex" }}>
+                <Box sx={{ width: "100%" }}>
+                  <Saving saving={saving} setSaving={setSaving} />
+                </Box>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={6} sx={{ display: "flex" }}>
+              <Paper sx={{ p: 2, flexGrow: 1, display: "flex" }}>
+                <Box sx={{ width: "100%" }}>
+                  <Balance balance={balance} setSaving={setSaving} />
+                </Box>
+              </Paper>
+            </Grid>
           </Grid>
-          <Grid
-            item
-            md={6}
-            sm={6}
-            sx={{
-              borderBottom: "2px solid lightgrey",
-              borderTop: "2px solid lightgrey",
-            }}
-          >
-            <Money
-              name="expense"
-              list={expenses}
-              setList={setExpenses}
-              balance={balance}
-            />
-          </Grid>
-          <Grid item md={6} sm={6}>
-            <Saving saving={saving} setSaving={setSaving} />
-          </Grid>
-          <Grid item md={6} sm={6}>
-            <Balance balance={balance} setSaving={setSaving} />
-          </Grid>
-        </Grid>
+        </Container>
       </Box>
     </ThemeProvider>
   );
