@@ -8,6 +8,7 @@ import TrendingDownRoundedIcon from "@mui/icons-material/TrendingDownRounded";
 
 import { MoneyProps } from "../types/money";
 import MoneyTable from "./MoneyTable";
+import { sanitizeMoneyInput } from "../utils/moneyInput";
 
 const Money = ({ name, list, balance, setList }: MoneyProps) => {
   const [title, setTitle] = useState("");
@@ -23,13 +24,14 @@ const Money = ({ name, list, balance, setList }: MoneyProps) => {
     clearInputs();
   };
 
-  const validateAmount = () => {
+  const validateAmount = (): boolean => {
     if (name === "income") {
       return Number(amount) < 0;
     }
     if (name === "expense") {
-      return Number(amount) > (balance || 0) ? true : false;
+      return Number(amount) > (balance || 0);
     }
+    return false;
   };
 
   const showMessage = () => {
@@ -75,17 +77,17 @@ const Money = ({ name, list, balance, setList }: MoneyProps) => {
         <TextField
           required
           label={` Amount`}
-          value={amount.toString().replace(/^0+/, "")}
-          onChange={(e) => setAmount(e.target.value)}
+          value={amount}
+          onChange={(e) => setAmount(sanitizeMoneyInput(e.target.value))}
           inputProps={{
-            inputMode: "numeric",
+            inputMode: "decimal",
             pattern: "^[0-9]*([,|.]{0,1}[0-9]{0,2})$",
           }}
           InputProps={{
             endAdornment: <InputAdornment position="end">€</InputAdornment>,
           }}
           error={validateAmount()}
-          helperText={showMessage()}
+          helperText={validateAmount() ? showMessage() : " "}
           placeholder="number"
         />
         <TextField

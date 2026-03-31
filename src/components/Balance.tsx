@@ -4,14 +4,19 @@ import CompareArrowsRoundedIcon from "@mui/icons-material/CompareArrowsRounded";
 import SwapHorizRoundedIcon from "@mui/icons-material/SwapHorizRounded";
 
 import { BalanceProps } from '../types/balance';
+import { parseMoneyInput, sanitizeMoneyInput } from "../utils/moneyInput";
 
 const Balance = ({balance, setSaving}:BalanceProps) => {
-  const [amount, setAmount] = useState(0);
+  const [amountInput, setAmountInput] = useState("");
+  const amount = parseMoneyInput(amountInput);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (amount <= 0 || validateAmount()) {
+      return;
+    }
     setSaving((saving) => saving + amount);
-    setAmount(0);
+    setAmountInput("");
   };
 
   const validateAmount = () => Number(amount) > (balance || 0);
@@ -45,15 +50,15 @@ const Balance = ({balance, setSaving}:BalanceProps) => {
         <TextField
           required
           label={"Transfer to saving account"}
-          value={amount.toString().replace(/^0+/, "")}
+          value={amountInput}
           placeholder="transfer money"
-          onChange={(e) => setAmount(isNaN(+e.target.value)? 0 : +e.target.value)}
+          onChange={(e) => setAmountInput(sanitizeMoneyInput(e.target.value))}
           inputProps={{
-            inputMode: "numeric",
+            inputMode: "decimal",
             pattern: "^[0-9]*([,|.]{0,1}[0-9]{0,2})$",
           }}
           error={validateAmount()}
-          helperText="Number can't be bigger than balance"
+          helperText={validateAmount() ? "Number can't be bigger than balance" : " "}
         />
 
         <Button

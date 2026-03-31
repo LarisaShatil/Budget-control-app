@@ -10,24 +10,19 @@ import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
 import RestartAltRoundedIcon from "@mui/icons-material/RestartAltRounded";
 
 import { SavingProps } from "../types/saving";
+import { parseMoneyInput, sanitizeMoneyInput } from "../utils/moneyInput";
 
 const Saving = ({ saving, setSaving }: SavingProps) => {
-  const [target, setTarget] = useState(0);
+  const [targetInput, setTargetInput] = useState("");
+  const target = parseMoneyInput(targetInput);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setTarget(0);
+    setTargetInput("");
 
     if (saving > 0) {
       setSaving(0);
     }
-  };
-
-  const addSaving = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const money = isNaN(+e.target.value) ? 0 : +e.target.value;
-    setTarget(money);
   };
 
   return (
@@ -60,10 +55,10 @@ const Saving = ({ saving, setSaving }: SavingProps) => {
 
         <TextField
           placeholder="set target"
-          value={target.toString().replace(/^0+/, "")}
-          onChange={(e) => addSaving(e)}
+          value={targetInput}
+          onChange={(e) => setTargetInput(sanitizeMoneyInput(e.target.value))}
           inputProps={{
-            inputMode: "numeric",
+            inputMode: "decimal",
             pattern: "^[0-9]*([,|.]{0,1}[0-9]{0,2})$",
           }}
           helperText="Type the numbers"
